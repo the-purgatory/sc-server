@@ -32,7 +32,7 @@ router.post('/login', function (req, res, next) {
       }
       const user_data = {
         _id: user._id,
-        isActive: user.isActive,
+        is_active: user.is_active,
         username: user.username,
         email: user.email,
         phone: user.phone,
@@ -79,7 +79,18 @@ router.post('/register', (req, res) => {
           newUser
             .save()
             .then((user) => {
-              res.status(200).send(constructRestResponse(200, 'SUCCESS'));
+              const user_data = {
+                _id: user._id,
+                is_active: user.is_active,
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                created_at: user.created_at,
+                last_seen: user.last_seen
+              };
+              res
+                .status(200)
+                .send(constructRestResponse(200, 'SUCCESS', user_data));
             })
             .catch((err) => {
               res.status(400).send(
