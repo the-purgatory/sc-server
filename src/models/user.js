@@ -80,6 +80,18 @@ const UserSchema = new Schema({
       ref: 'Message'
     }
   ],
+  pinned_users: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
+  blocked_users: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
   meta: Schema.Types.Mixed
 });
 
@@ -204,17 +216,47 @@ UserSchema.methods.removeUser = async function (id) {
 };
 
 /**
- * @todo: this is unstable
+ * id - user id
+ * mark - array of user ids
+ * unmark - array of user ids
  */
-UserSchema.methods.addUser = function (errorCallback, successCallback) {
+UserSchema.methods.markFavourite = async function (id, mark = [], unmark = []) {
+  return UserModel.findOneAndUpdate(
+    { _id: id },
+    {
+      $addToSet: { pinned_users: { $each: mark } },
+      $pull: { pinned_users: { $in: unmark } }
+    }
+  );
+};
+
+/**
+ * id - user id
+ * mark - array of user ids
+ * unmark - array of user ids
+ */
+UserSchema.methods.markBlock = async function (id, mark = [], unmark = []) {
+  return UserModel.findOneAndUpdate(
+    { _id: id },
+    {
+      $addToSet: { blocked_users: { $each: mark } },
+      $pull: { blocked_users: { $in: unmark } }
+    }
+  );
+};
+
+/**
+ * @todo: this is not used anywhere
+ */
+UserSchema.methods.addUser = function (
+  { username, password, email, phone },
+  errorCallback,
+  successCallback
+) {
   const newUser = new UserModel({
-    // eslint-disable-next-line no-undef
     username,
-    // eslint-disable-next-line no-undef
     password,
-    // eslint-disable-next-line no-undef
     email,
-    // eslint-disable-next-line no-undef
     phone
   });
 
