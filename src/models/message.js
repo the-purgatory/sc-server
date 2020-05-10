@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const TYPE = Object.freeze({
+const TRANSMISSION_TYPE = Object.freeze({
   DIRECT: 0,
   MULTICAST: 1,
   BROADCAST: 2,
@@ -10,25 +10,35 @@ const TYPE = Object.freeze({
 });
 
 const MessageSchema = new Schema({
-  content: {
-    type: String,
-    required: true
-  },
   sender: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  reciever: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
+  reciever: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
+  content: {
+    type: String,
+    required: true
+  },
+  // content type - https://stackoverflow.com/questions/23714383/what-are-all-the-possible-values-for-http-content-type-header
+  content_type: {
+    type: String,
+    required: true
   },
   timestamp: {
     type: Date,
     default: Date.now
   },
-  type: {
+  expiration_time: {
+    type: Date
+  },
+  transmission_type: {
     type: String,
-    enum: Object.values(TYPE)
+    enum: Object.values(TRANSMISSION_TYPE)
   },
   meta: Schema.Types.Mixed
 });

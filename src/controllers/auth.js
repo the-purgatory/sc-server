@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 
-const { constructRestResponse } = require('../helpers');
+const { constructRestResponse, parseUserDataToSend } = require('../helpers');
 
 const { UserModel } = require('../models');
 
@@ -30,15 +30,7 @@ router.post('/login', function (req, res, next) {
       if (err) {
         return next(err);
       }
-      const user_data = {
-        _id: user._id,
-        is_active: user.is_active,
-        username: user.username,
-        email: user.email,
-        phone: user.phone,
-        created_at: user.created_at,
-        last_seen: user.last_seen
-      };
+      const user_data = parseUserDataToSend(user, true);
       return res
         .status(200)
         .send(constructRestResponse(200, 'SUCCESS', user_data));
@@ -79,15 +71,7 @@ router.post('/register', (req, res) => {
           newUser
             .save()
             .then((user) => {
-              const user_data = {
-                _id: user._id,
-                is_active: user.is_active,
-                username: user.username,
-                email: user.email,
-                phone: user.phone,
-                created_at: user.created_at,
-                last_seen: user.last_seen
-              };
+              const user_data = parseUserDataToSend(user, true);
               res
                 .status(200)
                 .send(constructRestResponse(200, 'SUCCESS', user_data));
